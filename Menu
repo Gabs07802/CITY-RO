@@ -12,7 +12,7 @@
 -- ║  Valores sugeridos: 0.8 (pequeno), 1.0 (normal), 1.2 (grande) ║
 -- ╚══════════════════════════════════════════════════════════════╝
 
-local GUI_SCALE = 0.4 -- ⭐ ALTERE ESTE VALOR PARA REDIMENSIONAR A GUI ⭐
+local GUI_SCALE = 0.4  -- ⭐ ALTERE ESTE VALOR PARA REDIMENSIONAR A GUI ⭐
 
 -- ╔══════════════════════════════════════════════════════════════╗
 -- ║  🎯 CONFIGURAÇÃO DE TAMANHO DO MINI MENU                    ║
@@ -331,14 +331,10 @@ bugReportText.Size = UDim2.new(0, 600 * GUI_SCALE, 0, 60 * GUI_SCALE)
 bugReportText.Position = UDim2.new(0, 30 * GUI_SCALE, 0, 395 * GUI_SCALE)
 bugReportText.BackgroundTransparency = 1
 bugReportText.Text = "Deseja relatar algum bug?\nEntre em nosso servidor do discord!"
-bugReportText.Font = Enum.Font.Gotham
-bugReportText.TextSize = 18 * GUI_SCALE
-bugReportText.TextColor3 = COLORS.Text
-bugReportText.TextXAlignment = Enum.TextXAlignment.Center
-bugReportText.TextYAlignment = Enum.TextYAlignment.Center
-bugReportText.TextWrapped = true
-bugReportText.Parent = contentFrame
--- ADICIONE ESTE CÓDIGO LOGO APÓS bugReportText.Parent = contentFrame
+
+-- ═══════════════════════════════════════════════════════════════
+-- FUNÇÕES DAS SESSÕES (DEFINIDAS ANTES DOS BOTÕES)
+-- ═══════════════════════════════════════════════════════════════
 
 -- Estados dos toggles
 local tg = {}
@@ -484,6 +480,201 @@ local function config()
     imageFrame.Visible=false usernameLabel.Visible=false welcomeText.Visible=false descriptionText.Visible=false devTitle.Visible=false dev1.Visible=false dev2.Visible=false discordButton.Visible=false bugReportText.Visible=false
     local t=Instance.new("TextLabel")t.Size=UDim2.new(1,-40*GUI_SCALE,0,60*GUI_SCALE)t.Position=UDim2.new(0,20*GUI_SCALE,0,20*GUI_SCALE)t.BackgroundTransparency=1 t.Text="CONFIGURAÇÕES"t.Font=Enum.Font.GothamBold t.TextSize=32*GUI_SCALE t.TextColor3=COLORS.Text t.TextXAlignment=Enum.TextXAlignment.Center t.Parent=contentFrame
     mkT(contentFrame,"EM BREVE","c1",20*GUI_SCALE,100*GUI_SCALE)
+
+-- ═══════════════════════════════════════════════════════════════
+-- BOTÕES DO MENU LATERAL (AGORA PODEM CHAMAR AS FUNÇÕES)
+-- ═══════════════════════════════════════════════════════════════
+
+-- Botões do menu lateral
+local menuButtons = {"HOME", "COMBATE", "TELEPORT", "VISUAL", "AUTO FARM", "CONFIG"}
+
+for i, buttonName in ipairs(menuButtons) do
+    local button = Instance.new("TextButton")
+    button.Name = buttonName
+    button.Size = UDim2.new(1, 0, 0, 70 * GUI_SCALE)
+    button.Position = UDim2.new(0, 0, 0, (i - 1) * 80 * GUI_SCALE)
+    button.BackgroundColor3 = (i == 1) and COLORS.Secondary or Color3.fromRGB(20, 20, 20)
+    button.BorderSizePixel = 0
+    button.Text = buttonName
+    button.Font = Enum.Font.GothamBold
+    button.TextSize = 24 * GUI_SCALE
+    button.TextColor3 = COLORS.Text
+    button.Parent = sideMenu
+    
+    local buttonCorner = Instance.new("UICorner")
+    buttonCorner.CornerRadius = UDim.new(0, 15 * GUI_SCALE)
+    buttonCorner.Parent = button
+    
+    button.MouseButton1Click:Connect(function()
+        for _, child in pairs(sideMenu:GetChildren()) do
+            if child:IsA("TextButton") then
+                child.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+            end
+        end
+        button.BackgroundColor3 = COLORS.Secondary
+        
+        if buttonName=="HOME"then home()
+        elseif buttonName=="COMBATE"then combate()
+        elseif buttonName=="TELEPORT"then teleport()
+        elseif buttonName=="VISUAL"then visual()
+        elseif buttonName=="AUTO FARM"then farm()
+        elseif buttonName=="CONFIG"then config()end
+    end)
+    
+    button.MouseEnter:Connect(function()
+        if button.BackgroundColor3 ~= COLORS.Secondary then
+            button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        end
+    end)
+    
+    button.MouseLeave:Connect(function()
+        if button.BackgroundColor3 ~= COLORS.Secondary then
+            button.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        end
+    end)
+end
+
+-- Área de conteúdo
+local contentFrame = Instance.new("Frame")
+contentFrame.Name = "ContentFrame"
+contentFrame.Size = UDim2.new(0, 900 * GUI_SCALE, 1, -120 * GUI_SCALE)
+contentFrame.Position = UDim2.new(0, 370 * GUI_SCALE, 0, 110 * GUI_SCALE)
+contentFrame.BackgroundTransparency = 1
+contentFrame.Parent = mainFrame
+
+-- Foto de perfil
+local imageFrame = Instance.new("ImageLabel")
+imageFrame.Name = "ProfileImage"
+imageFrame.Size = UDim2.new(0, 240 * GUI_SCALE, 0, 240 * GUI_SCALE)
+imageFrame.Position = UDim2.new(0, 30 * GUI_SCALE, 0, 40 * GUI_SCALE)
+imageFrame.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+imageFrame.BorderSizePixel = 0
+imageFrame.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=420&height=420&format=png"
+imageFrame.Parent = contentFrame
+
+local imageCorner = Instance.new("UICorner")
+imageCorner.CornerRadius = UDim.new(1, 0)
+imageCorner.Parent = imageFrame
+
+-- Nome do usuário
+local usernameLabel = Instance.new("TextLabel")
+usernameLabel.Size = UDim2.new(0, 240 * GUI_SCALE, 0, 40 * GUI_SCALE)
+usernameLabel.Position = UDim2.new(0, 30 * GUI_SCALE, 0, 295 * GUI_SCALE)
+usernameLabel.BackgroundTransparency = 1
+usernameLabel.Text = player.Name -- Nome real do jogador
+usernameLabel.Font = Enum.Font.GothamBold
+usernameLabel.TextSize = 18 * GUI_SCALE
+usernameLabel.TextColor3 = COLORS.Text
+usernameLabel.TextXAlignment = Enum.TextXAlignment.Center
+usernameLabel.Parent = contentFrame
+
+-- Textos do lado direito
+local welcomeText = Instance.new("TextLabel")
+welcomeText.Size = UDim2.new(0, 580 * GUI_SCALE, 0, 40 * GUI_SCALE)
+welcomeText.Position = UDim2.new(0, 290 * GUI_SCALE, 0, 30 * GUI_SCALE)
+welcomeText.BackgroundTransparency = 1
+welcomeText.Text = "Olá, seja bem-vindo ao GHZ MENU RP"
+welcomeText.Font = Enum.Font.GothamBold
+welcomeText.TextSize = 22 * GUI_SCALE
+welcomeText.TextColor3 = COLORS.Text
+welcomeText.TextXAlignment = Enum.TextXAlignment.Left
+welcomeText.TextWrapped = true
+welcomeText.Parent = contentFrame
+
+local descriptionText = Instance.new("TextLabel")
+descriptionText.Size = UDim2.new(0, 580 * GUI_SCALE, 0, 60 * GUI_SCALE)
+descriptionText.Position = UDim2.new(0, 290 * GUI_SCALE, 0, 75 * GUI_SCALE)
+descriptionText.BackgroundTransparency = 1
+descriptionText.Text = "O script para roblox focado no mapa\nSINTONIA RP"
+descriptionText.Font = Enum.Font.Gotham
+descriptionText.TextSize = 20 * GUI_SCALE
+descriptionText.TextColor3 = COLORS.Text
+descriptionText.TextXAlignment = Enum.TextXAlignment.Left
+descriptionText.TextWrapped = true
+descriptionText.Parent = contentFrame
+
+local devTitle = Instance.new("TextLabel")
+devTitle.Size = UDim2.new(0, 580 * GUI_SCALE, 0, 40 * GUI_SCALE)
+devTitle.Position = UDim2.new(0, 290 * GUI_SCALE, 0, 160 * GUI_SCALE)
+devTitle.BackgroundTransparency = 1
+devTitle.Text = "Desenvolvedor"
+devTitle.Font = Enum.Font.GothamBold
+devTitle.TextSize = 26 * GUI_SCALE
+devTitle.TextColor3 = COLORS.Text
+devTitle.TextXAlignment = Enum.TextXAlignment.Center
+devTitle.Parent = contentFrame
+
+local dev1 = Instance.new("TextLabel")
+dev1.Size = UDim2.new(0, 580 * GUI_SCALE, 0, 35 * GUI_SCALE)
+dev1.Position = UDim2.new(0, 290 * GUI_SCALE, 0, 205 * GUI_SCALE)
+dev1.BackgroundTransparency = 1
+dev1.Text = "By: ghzmenu_developer"
+dev1.Font = Enum.Font.Gotham
+dev1.TextSize = 19 * GUI_SCALE
+dev1.TextColor3 = COLORS.Text
+dev1.TextXAlignment = Enum.TextXAlignment.Center
+dev1.Parent = contentFrame
+
+local dev2 = Instance.new("TextLabel")
+dev2.Size = UDim2.new(0, 580 * GUI_SCALE, 0, 35 * GUI_SCALE)
+dev2.Position = UDim2.new(0, 290 * GUI_SCALE, 0, 240 * GUI_SCALE)
+dev2.BackgroundTransparency = 1
+dev2.Text = "By: atr3uss_"
+dev2.Font = Enum.Font.Gotham
+dev2.TextSize = 19 * GUI_SCALE
+dev2.TextColor3 = COLORS.Text
+dev2.TextXAlignment = Enum.TextXAlignment.Center
+dev2.Parent = contentFrame
+
+-- Botão Discord
+local discordButton = Instance.new("TextButton")
+discordButton.Size = UDim2.new(0, 300 * GUI_SCALE, 0, 70 * GUI_SCALE)
+discordButton.Position = UDim2.new(0, 430 * GUI_SCALE, 0, 295 * GUI_SCALE)
+discordButton.BackgroundColor3 = COLORS.Secondary
+discordButton.BorderSizePixel = 0
+discordButton.Text = "Discord.link"
+discordButton.Font = Enum.Font.GothamBold
+discordButton.TextSize = 26 * GUI_SCALE
+discordButton.TextColor3 = COLORS.Text
+discordButton.Parent = contentFrame
+
+local discordCorner = Instance.new("UICorner")
+discordCorner.CornerRadius = UDim.new(0, 35 * GUI_SCALE)
+discordCorner.Parent = discordButton
+
+discordButton.MouseEnter:Connect(function()
+    discordButton.BackgroundColor3 = COLORS.Accent
+end)
+
+discordButton.MouseLeave:Connect(function()
+    discordButton.BackgroundColor3 = COLORS.Secondary
+end)
+
+discordButton.MouseButton1Click:Connect(function()
+    setclipboard(DISCORD_LINK)
+    local originalText = discordButton.Text
+    discordButton.Text = "✓ Link copiado!"
+    discordButton.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+    task.wait(1.5)
+    discordButton.Text = originalText
+    discordButton.BackgroundColor3 = COLORS.Secondary
+end)
+
+-- Texto bug report
+local bugReportText = Instance.new("TextLabel")
+bugReportText.Size = UDim2.new(0, 600 * GUI_SCALE, 0, 60 * GUI_SCALE)
+bugReportText.Position = UDim2.new(0, 30 * GUI_SCALE, 0, 395 * GUI_SCALE)
+bugReportText.BackgroundTransparency = 1
+bugReportText.Text = "Deseja relatar algum bug?\nEntre em nosso servidor do discord!"
+bugReportText.Font = Enum.Font.Gotham
+bugReportText.TextSize = 18 * GUI_SCALE
+bugReportText.TextColor3 = COLORS.Text
+bugReportText.TextXAlignment = Enum.TextXAlignment.Center
+bugReportText.TextYAlignment = Enum.TextYAlignment.Center
+bugReportText.TextWrapped = true
+bugReportText.Parent = contentFrame
+-- ADICIONE ESTE CÓDIGO LOGO APÓS bugReportText.Parent = contentFrame
+
     mkT(contentFrame,"EM BREVE","c2",20*GUI_SCALE,170*GUI_SCALE)
     mkT(contentFrame,"EM BREVE","c3",20*GUI_SCALE,240*GUI_SCALE)
     mkT(contentFrame,"EM BREVE","c4",20*GUI_SCALE,310*GUI_SCALE)
